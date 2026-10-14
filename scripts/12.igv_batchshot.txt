@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# scripts/12.igv_batchshot.txt
+#
+# IGV 批量截图脚本（IGV batch file 格式）
+# 用法：igv -b scripts/12.igv_batchshot.txt
+#
+# 准备：IGV 桌面版 ≥ 2.19，且 BAM/VCF/BED 文件已存在
+# 修改：把下面所有 <项目根>/WGS_tutorial 替换为你的实际路径
+# 详细说明见教程 §4.14.4.1.5
+#
+new
+genome hg38
+load <项目根>/WGS_tutorial/10.cnv/results/NA12878_cnv_calls.bed
+load <项目根>/WGS_tutorial/11.sv/merged/NA12878_chr20_SVs_merged.vcf.gz
+load <项目根>/WGS_tutorial/07.var.filtered/NA12878_chr20_filtered.vcf.gz
+load <项目根>/WGS_tutorial/05.bqsr/NA12878_chr20_BQSR.bam
+snapshotDirectory <项目根>/WGS_tutorial/12.figures/screenshots
+
+setSleepInterval 1000
+
+# 位点 1：杂合 SNV（chr20:68303）
+goto chr20:68250-68350
+sort base
+snapshot pos1_snv_68303.png
+
+# 位点 2：纯合缺失（chr20:34889369）
+goto chr20:34889250-34889450
+sort base
+snapshot pos2_homdel_34889369.png
+
+# 位点 3：复杂 SV（DUP + DEL 重叠，chr20:2,379,257）
+goto chr20:2377500-2381500
+sort base
+snapshot pos3_complex_sv_2379257.png
+
+# 位点 4：CNV DUP（chr20:26,450,000-29,950,000）
+goto chr20:27,005,000-27,020,000
+sort base
+snapshot pos4_cnv_dup.png
+
+exit

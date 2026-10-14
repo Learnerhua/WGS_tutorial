@@ -1,0 +1,164 @@
+# 13.config.yaml — WGS Snakemake 流程的集中配置
+#
+# 本项目 (NA12878 chr20 30× WGS) 全部资源 + 工具路径 + 步骤参数
+#
+# 设计原则：
+#   1. 所有路径都写绝对路径 / 项目内相对路径，**不依赖环境变量**
+#   2. 所有工具用绝对路径调用，**不依赖 conda activate**
+#   3. 所有可调阈值（BQSR / 硬过滤 / CNV / SV）集中在此
+#   4. 改路径 = 改这个文件 = 全部规则生效
+#   5. 启动脚本 13.run_snakemake.sh 会校验每个路径是否存在
+#
+# 用法：被 13.snakefile 顶部 `configfile:` 引用
+
+# ─────────────────────────────────────────────────
+# 项目根目录（所有相对路径以这里为基准）
+# ─────────────────────────────────────────────────
+project_root: "/Nas3Data/users/ouyjh/WorkSpace/WGS_tutorial"
+out_root:       "13.snakemake"
+scripts_dir:  "scripts"
+logs_dir:     "logs"
+
+# ─────────────────────────────────────────────────
+# 组 1：样本与参考
+# ─────────────────────────────────────────────────
+sample:         "NA12878_chr20"                # 主前缀：01–09 产物
+sample_short:   "NA12878"                      # 短前缀：10–12 的 CNV/SV/图产物
+sample_label:   "NA12878 chr20"                # 展示文本：图标题等
+rg_flowcell:    "HMVFKDRXX.2"                  # 测序 flowcell.lane（Read Group ID 后缀）
+rg_pu:          "HMVFKDRXX.2.ACGTACGT"         # Read Group platform unit
+
+# FASTQ 入口（只读）
+fastq_r1:       "rawData/fastq/NA12878_chr20_R1.fastq.gz"
+fastq_r2:       "rawData/fastq/NA12878_chr20_R2.fastq.gz"
+samples:        ["NA12878_chr20"]   # 数组形式保留扩展余地（trio 模式下加 NA12891/92）
+chrom:          "chr20"
+
+ref:            "rawData/ref/Homo_sapiens_assembly38.fasta"
+ref_fai:        "rawData/ref/Homo_sapiens_assembly38.fasta.fai"
+ref_dict:       "rawData/ref/Homo_sapiens_assembly38.dict"
+
+# chr20 长度（脚本里可能用到）
+chrom_len:      64444167
+
+# ─────────────────────────────────────────────────
+# 组 2：工具绝对路径（隔离环境，避 conda activate）
+# ─────────────────────────────────────────────────
+#  WGS env (Python 3.11)
+python_wgs:     "/oldhome/ouyjh/miniforge3/envs/WGS/bin/python3"
+bwa:            "/oldhome/ouyjh/miniforge3/envs/WGS/bin/bwa-mem2"
+samtools:       "/oldhome/ouyjh/miniforge3/envs/WGS/bin/samtools"
+gatk:           "/oldhome/ouyjh/miniforge3/envs/WGS/bin/gatk"
+bcftools:       "/oldhome/ouyjh/miniforge3/envs/WGS/bin/bcftools"
+delly:          "/oldhome/ouyjh/miniforge3/envs/WGS/bin/delly"
+survivor:       "/oldhome/ouyjh/miniforge3/envs/WGS/bin/SURVIVOR"
+r_wgs:          "/oldhome/ouyjh/miniforge3/envs/WGS/bin/Rscript"
+
+#  cnv_env (R 4.5 + CNVkit 0.9.14)
+python_cnv:     "/oldhome/ouyjh/miniforge3/envs/cnv_env/bin/python3"
+cnvkit:         "/oldhome/ouyjh/miniforge3/envs/cnv_env/bin/cnvkit.py"
+bedtools:       "/oldhome/ouyjh/miniforge3/envs/cnv_env/bin/bedtools"
+
+#  vep_env (VEP 105)
+#  VEP 105 必须用 vep_env 的 perl + 显式 PERL5LIB（直接调 vep 会 Bio::PrimarySeqI 报错）
+vep_perl:       "/oldhome/ouyjh/miniforge3/envs/vep_env/bin/perl"
+vep_lib1:       "/oldhome/ouyjh/miniforge3/envs/vep_env/lib/site_perl/5.26.2"
+vep_lib2:       "/oldhome/ouyjh/miniforge3/envs/vep_env/lib/5.26.2"
+vep_bin:        "/oldhome/ouyjh/miniforge3/envs/vep_env/share/ensembl-vep-105.0-0/vep"
+vep_python:     "/oldhome/ouyjh/miniforge3/envs/vep_env/bin/python3"
+igv_reports:    "/oldhome/ouyjh/miniforge3/envs/WGS/bin/create_report"  # 1.17 用 create_report 命令（不是 igv-reports）
+
+#  Manta 1.6.0 预编译（conda 装不了，必须走预编译 + cd bin/）
+manta_dir:      "/oldhome/ouyjh/Download/manta-1.6.0.centos6_x86_64"      # 根目录（snakefile 里用 cd {manta_dir}/bin）
+python_py27:    "/oldhome/ouyjh/miniforge3/envs/py27/bin/python2.7"   # Manta shebang 依赖
+
+# ─────────────────────────────────────────────────
+# 组 3：已下载资源（不再触发下载）
+# ─────────────────────────────────────────────────
+#  4.5 BQSR 资源（GRCh38）
+mills_indels:   "rawData/resources/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz"
+known_indels:   "rawData/resources/1000G_phase1.snps.high_confidence.hg38.vcf.gz"
+omni:           "rawData/resources/1000G_omni2.5.hg38.vcf.gz"
+hapmap:         "rawData/resources/hapmap_3.3.hg38.vcf.gz"
+
+#  4.8 VEP cache
+vep_cache:      "rawData/vep_cache"   # 内含 homo_sapiens/105_GRCh38（29 GB，--dir_cache 用）
+
+#  4.10 数据库（已下好）
+dgv_chr20:      "rawData/databases/dgv/dgvGold.chr20.bed"
+gnomad_sv:      "rawData/databases/sv/gnomad.v4.1.sv.sites.vcf.gz"
+mim2gene:       "rawData/databases/mim2gene.txt"
+hpo_obo:        "rawData/databases/hp.obo"
+hpo_genes:      "rawData/databases/genes_to_phenotype.txt"
+
+#  4.10 排除区
+excl_regions:   "rawData/resources/human.hg38.excl.tsv"
+
+#  4.12 CNV
+genes_bed:      "rawData/resources/Homo_sapiens_GRCh38_genes.bed"
+
+# ─────────────────────────────────────────────────
+# 组 4：步骤参数
+# ─────────────────────────────────────────────────
+#  4.2 fastp
+fastp_threads:  16
+
+#  4.3 BWA-MEM2 + samtools sort
+bwa_threads:    32
+sort_threads:   16
+
+#  4.5 BQSR（picard / GATK 单线程最稳）
+bqsr_threads:   1
+bqsr_mem:       32     # GB
+
+#  4.6 HaplotypeCaller
+hc_threads:     16
+hc_mem:         64     # GB
+hc_padding:     100    # bp 边界外延
+
+#  4.8 硬过滤阈值（SNV）
+fs_snv:         60
+sor_snv:        3
+qd_snv:         2
+mq_snv:         40
+mqrs_snv:      -12.5
+rprs_snv:      -8.0
+
+#  4.8 硬过滤阈值（INDEL）
+fs_indel:       200
+sor_indel:      10
+qd_indel:       2
+rprs_indel:    -20.0
+
+#  4.9 VEP
+vep_fork:       8
+vep_max_sv:     "1000000"   # 1 Mb 内含子移位忽略
+
+#  4.10 候选过滤（43 → 12）
+loeuf_thresh:   0.35
+af_thresh:      0.01
+
+#  4.12 CNV
+cnv_bin_size:   50000       # 50 kb bin
+cnv_min_size:   100000      # 100 kb 最小 CNV
+cnv_min_probes: 10          # 最少探针数
+cnv_threads:    4
+
+#  4.13 SV
+min_sv_size:    50
+sv_threads:     8
+
+#  SURVIVOR 合并参数
+survivor_dist:  500         # bp 内视为同一事件
+survivor_supp:  2           # 最少 caller 数
+survivor_type:  1           # 1 = 要求 SVTYPE 一致
+survivor_strand: 0          # 0 = 不要求链方向
+survivor_min_len: 50        # 最小 SV 长度
+
+# ─────────────────────────────────────────────────
+# Snakemake 自身行为
+# ─────────────────────────────────────────────────
+#  性能
+default_threads: 8
+default_mem_mb:  8192    # 8 GB
+default_runtime: 1440    # 24 h

@@ -1,0 +1,5 @@
+Tier	Count	Percent
+novel (AF=0/缺失)	15384	13.5%
+ultra-rare (AF<0.001)	701	0.6%
+rare (0.001<=AF<0.01)	1551	1.4%
+common (AF>=0.01)	96520	84.6%
