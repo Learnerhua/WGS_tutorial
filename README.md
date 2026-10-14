@@ -12,6 +12,12 @@ against **GRCh38**, from raw FASTQ to annotated variants, CNVs, SVs and publicat
 
 ---
 
+## Pipeline Overview
+
+![Pipeline overview](pipeline_overview_en.svg)
+
+---
+
 ## Highlights
 
 | | |
@@ -66,12 +72,6 @@ against **GRCh38**, from raw FASTQ to annotated variants, CNVs, SVs and publicat
 | SURVIVOR consensus | **59** (55 DEL, 3 DUP, 1 INS) |
 | Known / novel (vs gnomAD-SV v4.1) | 58 / 1 |
 | Multi-gate clinical candidates | **43** genes |
-
----
-
-## Pipeline Overview
-
-![Pipeline overview](pipeline_overview_en.svg)
 
 ---
 
