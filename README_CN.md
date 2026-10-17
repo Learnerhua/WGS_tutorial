@@ -1,7 +1,11 @@
 # 全基因组测序（WGS）生殖系变异分析 — 完整流程与教程
 
+<div align="center">
+
 ![WGS](https://img.shields.io/badge/WGS-生殖系变异分析-blue?style=flat-square) ![Snakemake](https://img.shields.io/badge/Snakemake-工作流-success?style=flat-square) ![BWA](https://img.shields.io/badge/BWA--MEM2-比对-orange?style=flat-square) ![GATK](https://img.shields.io/badge/GATK-4.6%20变异调用-purple?style=flat-square)<br>
 ![VEP](https://img.shields.io/badge/VEP-105%20注释-informational?style=flat-square) ![Python](https://img.shields.io/badge/Python-3.11-yellow?style=flat-square) ![Linux](https://img.shields.io/badge/platform-Linux-lightgrey?style=flat-square) ![MIT](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)
+
+</div>
 
 [English](README.md) | [简体中文](README_CN.md)
 

@@ -1,7 +1,11 @@
 # WGS Germline Variant Calling — Hands-on Pipeline & Tutorial
 
+<div align="center">
+
 ![WGS](https://img.shields.io/badge/WGS-Germline_Variant_Calling-blue?style=flat-square) ![Snakemake](https://img.shields.io/badge/Snakemake-Workflow-success?style=flat-square) ![BWA](https://img.shields.io/badge/BWA--MEM2-Alignment-orange?style=flat-square) ![GATK](https://img.shields.io/badge/GATK-4.6%20Variant%20Calling-purple?style=flat-square)<br>
 ![VEP](https://img.shields.io/badge/VEP-105%20Annotation-informational?style=flat-square) ![Python](https://img.shields.io/badge/Python-3.11-yellow?style=flat-square) ![Linux](https://img.shields.io/badge/platform-Linux-lightgrey?style=flat-square) ![MIT](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)
+
+</div>
 
 [English](README.md) | [简体中文](README_CN.md)
 
